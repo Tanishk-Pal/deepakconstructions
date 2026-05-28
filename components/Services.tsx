@@ -92,10 +92,11 @@ export default function Services() {
 
             <p className="text-gray-600 text-base sm:text-lg leading-8 sm:leading-10 mt-8 max-w-4xl">
 
-              Deepak Construction delivers reliable infrastructure,
-              excavation, industrial pipeline and civil construction
-              services with precision engineering, modern equipment
-              and experienced execution teams.
+              Deepak Construction भरोसेमंद Infrastructure, Pipeline,
+              Excavation aur Civil Construction services provide karta hai.
+              Hum modern machine, experienced staff aur strong execution ke saath
+              high-quality kaam time par complete karte hain — चाहे industrial
+              pipeline ho, road work ho ya large construction project.
 
             </p>
 

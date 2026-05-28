@@ -170,28 +170,28 @@ export default function Contact() {
 
           <div className="overflow-hidden rounded-[25px] h-72 group">
             <img
-              src="/contact1.webp"
+              src="/img.png"
               className="w-full h-full object-cover group-hover:scale-110 transition duration-700"
             />
           </div>
 
           <div className="overflow-hidden rounded-[25px] h-72 group">
             <img
-              src="/contact2.webp"
+              src="/excavation.png"
               className="w-full h-full object-cover group-hover:scale-110 transition duration-700"
             />
           </div>
 
           <div className="overflow-hidden rounded-[25px] h-72 group">
             <img
-              src="/contact3.webp"
+              src="/building.png"
               className="w-full h-full object-cover group-hover:scale-110 transition duration-700"
             />
           </div>
 
           <div className="overflow-hidden rounded-[25px] h-72 group">
             <img
-              src="/contact4.webp"
+              src="/pipeline.png"
               className="w-full h-full object-cover group-hover:scale-110 transition duration-700"
             />
           </div>

@@ -27,7 +27,7 @@ const services: any = {
         title: "Excavation Work",
         image: "/excavation.png",
         gallery: ["/excavation1.png", "/excavation2.png", "/excavation3.png"],
-        video: "/Excavation.mp4",
+        video: "/Excavation-vid.mp4",
         description:
             "Advanced excavation operations using modern heavy machinery and skilled operators.",
         details:
@@ -37,8 +37,8 @@ const services: any = {
     "industrial-pipeline-systems": {
         title: "Industrial Pipeline Systems",
         image: "/industrial.png",
-        gallery: ["/industrial1.png", "/industrial2.png", "/industrial3.png"],
-        video: "/industrial-video.mp4",
+        gallery: ["/drainage.png", "/excavation.png", "/pipeline.png"],
+        video: "/Excavation-vid.mp4",
         description:
             "Industrial-grade pipeline systems designed for performance, durability and operational safety.",
         details:
@@ -48,8 +48,8 @@ const services: any = {
     "building-construction": {
         title: "Building Construction",
         image: "/building.png",
-        gallery: ["/building1.png", "/building2.png", "/building3.png"],
-        video: "/building-video.mp4",
+        gallery: ["/JCB.png", "/building.png", "/img.png"],
+        video: "/civil-work.mp4",
         description:
             "Professional building construction services from foundation to structural execution.",
         details:
@@ -59,7 +59,7 @@ const services: any = {
     "drainage-infrastructure": {
         title: "Drainage Infrastructure",
         image: "/drainage.png",
-        gallery: ["/drainage1.png", "/drainage2.png", "/drainage3.png"],
+        gallery: ["/industrial.png", "/JCB.png", "/drainage.png"],
         video: "/drainage-video.mp4",
         description:
             "Efficient drainage and wastewater infrastructure systems for urban and industrial development.",

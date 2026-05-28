@@ -51,12 +51,22 @@ export default function Navbar() {
           </Link>
         </div>
 
-        <button
-          onClick={() => setOpen(!open)}
-          className="md:hidden text-white border border-white/10 p-2 rounded-xl bg-white/[0.04]"
-        >
-          {open ? <X size={22} /> : <Menu size={22} />}
-        </button>
+        <div className="flex items-center gap-2 md:hidden">
+          <a
+            href="tel:+916260879372"
+            className="flex items-center gap-1 bg-emerald-500 text-white px-3 py-2 rounded-full font-bold text-sm shadow-[0_0_20px_rgba(16,185,129,0.35)]"
+          >
+            <PhoneCall size={16} />
+            Call
+          </a>
+
+          <button
+            onClick={() => setOpen(!open)}
+            className="text-white border border-white/10 p-2 rounded-xl bg-white/[0.04]"
+          >
+            {open ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </div>
 
       {open && (
