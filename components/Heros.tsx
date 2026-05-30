@@ -8,21 +8,13 @@ import { db } from "@/lib/firebase";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import MagneticButton from "@/components/animations/MagneticButton";
 
-// ─────────────────────────────────────────────────────────────
-// TYPES
-// ─────────────────────────────────────────────────────────────
 interface ReelVideo {
   id: string;
-  src: string;       // Cloudinary URL or /public path like /Excavation-vid.mp4
-  label: string;     // e.g. "Excavation Work"
-  order?: number;    // for sorting
+  src: string;
+  label: string;
+  order?: number;
 }
 
-// ─────────────────────────────────────────────────────────────
-// FALLBACK videos from your /public folder
-// These show instantly before Firebase loads
-// Add/remove based on what's in your /public folder
-// ─────────────────────────────────────────────────────────────
 const FALLBACK_VIDEOS: ReelVideo[] = [
   { id: "f1", src: "/Excavation-vid.mp4", label: "Excavation Work", order: 1 },
   { id: "f2", src: "/Excavation.mp4", label: "Site Excavation", order: 2 },
@@ -36,214 +28,268 @@ const stats = [
   { value: "24/7", label: "Client Support" },
 ];
 
-// ─────────────────────────────────────────────────────────────
-// MOBILE REEL FEED
-// ─────────────────────────────────────────────────────────────
-function MobileReelFeed() {
-  const [videos, setVideos] = useState<ReelVideo[]>(FALLBACK_VIDEOS);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [muted, setMuted] = useState(true);
-  const [loading, setLoading] = useState(true);
-  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
-
-  // ── Fetch videos from Firebase in real-time ──
-  useEffect(() => {
-    const q = query(collection(db, "reels"), orderBy("order", "asc"));
-    const unsub = onSnapshot(q, (snap) => {
-      if (!snap.empty) {
-        const fetched: ReelVideo[] = snap.docs.map((doc) => ({
-          id: doc.id,
-          ...(doc.data() as Omit<ReelVideo, "id">),
-        }));
-        setVideos(fetched);
-      }
-      // If Firestore empty → fallback videos stay
-      setLoading(false);
-    }, () => {
-      // On error → keep fallback videos
-      setLoading(false);
-    });
-    return () => unsub();
-  }, []);
-
-  // ── Play active video, pause others ──
-  useEffect(() => {
-    videoRefs.current.forEach((vid, i) => {
-      if (!vid) return;
-      if (i === activeIndex) {
-        vid.play().catch(() => { });
-      } else {
-        vid.pause();
-        vid.currentTime = 0;
-      }
-    });
-  }, [activeIndex, videos]);
-
-  // ── IntersectionObserver for snap-scroll detection ──
-  useEffect(() => {
-    const observers: IntersectionObserver[] = [];
-    videoRefs.current.forEach((vid, i) => {
-      if (!vid) return;
-      const obs = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting && entry.intersectionRatio > 0.6) {
-            setActiveIndex(i);
-          }
-        },
-        { threshold: 0.6 }
-      );
-      obs.observe(vid);
-      observers.push(obs);
-    });
-    return () => observers.forEach((o) => o.disconnect());
-  }, [videos]);
+function AnimatedCompanyName() {
+  const words = ["Deepak", "Construction"];
 
   return (
-    <div
-      className="relative w-full h-screen overflow-y-scroll snap-y snap-mandatory"
-      style={{ scrollbarWidth: "none" }}
-    >
-      <style>{`div::-webkit-scrollbar{display:none}`}</style>
-
-      {videos.map((reel, i) => (
-        <div
-          key={reel.id}
-          className="relative w-full h-screen snap-start snap-always bg-black"
+    <div className="flex items-center gap-2">
+      {words.map((word, index) => (
+        <motion.span
+          key={word}
+          initial={{ opacity: 0, y: -12, filter: "blur(8px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{
+            delay: 0.15 + index * 0.28,
+            duration: 0.55,
+            ease: "easeOut",
+          }}
+          className={`text-[18px] font-black tracking-[-0.8px] ${index === 0 ? "text-white" : "text-[#d89b1d]"
+            }`}
         >
-          {/* Video */}
-          <video
-            ref={(el) => { videoRefs.current[i] = el; }}
-            src={reel.src}
-            muted={muted}
-            loop
-            playsInline
-            preload={i === 0 ? "auto" : "metadata"}
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-black/40" />
-
-          {/* Top bar */}
-          <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 pt-10 pb-3 z-10">
-            <div>
-              <p className="text-[10px] tracking-[3px] text-[#d89b1d] font-semibold uppercase">
-                Deepak Construction
-              </p>
-              <p className="text-white/50 text-[11px] mt-0.5">Itarsi, Madhya Pradesh</p>
-            </div>
-
-            {/* Mute toggle */}
-            <button
-              onClick={() => setMuted((m) => !m)}
-              className="w-9 h-9 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20"
-              aria-label={muted ? "Unmute" : "Mute"}
-            >
-              {muted ? (
-                <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
-                  <path d="M16.5 12A4.5 4.5 0 0 0 14 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51A8.796 8.796 0 0 0 21 12c0-4.28-3-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3 3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06A8.99 8.99 0 0 0 17.73 19L19 20.27 20.27 19 5.27 3 4.27 3zM12 4 9.91 6.09 12 8.18V4z" />
-                </svg>
-              ) : (
-                <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
-                  <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
-                </svg>
-              )}
-            </button>
-          </div>
-
-          {/* Scroll dots — right side */}
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex flex-col gap-1.5 z-10">
-            {videos.map((_, di) => (
-              <div
-                key={di}
-                className="rounded-full transition-all duration-300"
-                style={{
-                  width: 3,
-                  height: di === i ? 22 : 6,
-                  background: di === i ? "#d89b1d" : "rgba(255,255,255,0.3)",
-                }}
-              />
-            ))}
-          </div>
-
-          {/* Bottom content */}
-          <div className="absolute bottom-0 left-0 right-0 px-5 pb-10 z-10">
-            <motion.div
-              key={reel.id}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.35 }}
-            >
-              <p className="text-white/40 text-[10px] tracking-[2px] uppercase mb-1">
-                Our Services
-              </p>
-              <h2 className="text-white text-2xl font-black mb-3">{reel.label}</h2>
-
-              {/* Stats */}
-              <div className="flex gap-5 mb-5">
-                {stats.map((s, si) => (
-                  <div key={si}>
-                    <p className="text-[#d89b1d] text-base font-black leading-none">{s.value}</p>
-                    <p className="text-white/40 text-[9px] uppercase tracking-[1.5px] mt-0.5">{s.label}</p>
-                  </div>
-                ))}
-              </div>
-
-              {/* CTAs */}
-              <div className="flex gap-3">
-                <Link href="#projects" className="flex-1">
-                  <button className="w-full bg-[#d89b1d] text-black text-sm font-black py-3 rounded-full shadow-[0_0_24px_rgba(216,155,29,0.4)]">
-                    View Projects
-                  </button>
-                </Link>
-                <Link href="#contact" className="flex-1">
-                  <button className="w-full border border-white/20 bg-white/[0.08] backdrop-blur-md text-white text-sm font-semibold py-3 rounded-full">
-                    Contact Us
-                  </button>
-                </Link>
-              </div>
-            </motion.div>
-          </div>
-
-          {/* Swipe hint on first reel */}
-          {i === 0 && (
-            <motion.div
-              className="absolute bottom-32 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 pointer-events-none z-10"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: [0, 1, 0] }}
-              transition={{ delay: 1.5, duration: 2, repeat: 2 }}
-            >
-              <svg width="20" height="20" fill="white" opacity="0.4" viewBox="0 0 24 24">
-                <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z" />
-              </svg>
-              <p className="text-white/30 text-[10px] tracking-widest uppercase">Swipe up</p>
-            </motion.div>
-          )}
-
-          {/* Loading shimmer on first load */}
-          {loading && i === 0 && (
-            <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-20">
-              <div className="w-8 h-8 border-2 border-[#d89b1d] border-t-transparent rounded-full animate-spin" />
-            </div>
-          )}
-        </div>
+          {word}
+        </motion.span>
       ))}
     </div>
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// MAIN HERO — Desktop unchanged, Mobile = Reel Feed
-// ─────────────────────────────────────────────────────────────
+function MobileReelFeed() {
+  const [videos, setVideos] = useState<ReelVideo[]>(FALLBACK_VIDEOS);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [muted, setMuted] = useState(true);
+  const [loading, setLoading] = useState(true);
+
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+
+  useEffect(() => {
+    const q = query(collection(db, "reels"), orderBy("order", "asc"));
+
+    const unsub = onSnapshot(
+      q,
+      (snap) => {
+        if (!snap.empty) {
+          const fetched: ReelVideo[] = snap.docs.map((doc) => ({
+            id: doc.id,
+            ...(doc.data() as Omit<ReelVideo, "id">),
+          }));
+          setVideos(fetched);
+        }
+        setLoading(false);
+      },
+      () => setLoading(false)
+    );
+
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    videoRefs.current.forEach((video, index) => {
+      if (!video) return;
+
+      if (index === activeIndex) {
+        video.play().catch(() => { });
+      } else {
+        video.pause();
+        video.currentTime = 0;
+      }
+    });
+  }, [activeIndex, videos]);
+
+  useEffect(() => {
+    const observers: IntersectionObserver[] = [];
+
+    videoRefs.current.forEach((video, index) => {
+      if (!video) return;
+
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting && entry.intersectionRatio > 0.65) {
+            setActiveIndex(index);
+          }
+        },
+        { threshold: [0.65] }
+      );
+
+      observer.observe(video);
+      observers.push(observer);
+    });
+
+    return () => observers.forEach((observer) => observer.disconnect());
+  }, [videos]);
+
+  return (
+    <div className="relative h-[100svh] w-full overflow-hidden bg-[#050505] text-white">
+      {/* Fixed Top Brand */}
+      <div className="fixed top-0 left-0 right-0 z-50 px-4 pt-[env(safe-area-inset-top)]">
+        <div className="mx-auto mt-3 flex h-14 max-w-[430px] items-center justify-between rounded-full border border-white/10 bg-black/45 px-4 backdrop-blur-xl shadow-[0_10px_35px_rgba(0,0,0,0.35)]">
+          <div>
+            <AnimatedCompanyName />
+            <p className="mt-[-2px] text-[9px] uppercase tracking-[2px] text-white/45">
+              Infrastructure • Pipeline • Civil Work
+            </p>
+          </div>
+
+          <button
+            onClick={() => setMuted((value) => !value)}
+            className="grid h-9 w-9 place-items-center rounded-full border border-white/10 bg-white/10"
+            aria-label={muted ? "Unmute video" : "Mute video"}
+          >
+            {muted ? (
+              <svg width="17" height="17" fill="white" viewBox="0 0 24 24">
+                <path d="M4.27 3 3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06A8.99 8.99 0 0 0 17.73 19L19 20.27 20.27 19 5.27 3H4.27zM12 4 9.91 6.09 12 8.18V4z" />
+              </svg>
+            ) : (
+              <svg width="17" height="17" fill="white" viewBox="0 0 24 24">
+                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+              </svg>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Reel Scroll */}
+      <div
+        className="h-[100svh] w-full snap-y snap-mandatory overflow-y-scroll scroll-smooth px-3 pt-20 pb-5"
+        style={{ scrollbarWidth: "none" }}
+      >
+        <style>{`
+          div::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
+
+        {videos.map((reel, index) => (
+          <section
+            key={reel.id}
+            className="relative flex h-[100svh] snap-start snap-always items-center justify-center"
+          >
+            <motion.div
+              initial={{ opacity: 0.7, scale: 0.96 }}
+              animate={{
+                opacity: activeIndex === index ? 1 : 0.55,
+                scale: activeIndex === index ? 1 : 0.94,
+              }}
+              transition={{ duration: 0.35, ease: "easeOut" }}
+              className="relative h-[76svh] w-full max-w-[430px] overflow-hidden rounded-[34px] border border-white/10 bg-[#101010] shadow-[0_28px_70px_rgba(0,0,0,0.55)]"
+            >
+              <video
+                ref={(el) => {
+                  videoRefs.current[index] = el;
+                }}
+                src={reel.src}
+                muted={muted}
+                loop
+                playsInline
+                preload={index === 0 ? "auto" : "metadata"}
+                className="absolute inset-0 h-full w-full object-cover"
+                onClick={(e) => {
+                  const video = e.currentTarget;
+                  if (video.paused) video.play().catch(() => { });
+                  else video.pause();
+                }}
+              />
+
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-black/25" />
+
+              {/* Reel Counter */}
+              <div className="absolute right-3 top-1/2 z-20 flex -translate-y-1/2 flex-col gap-1.5">
+                {videos.map((_, dotIndex) => (
+                  <span
+                    key={dotIndex}
+                    className={`rounded-full transition-all duration-300 ${dotIndex === index
+                        ? "h-6 w-1 bg-[#d89b1d]"
+                        : "h-2 w-1 bg-white/30"
+                      }`}
+                  />
+                ))}
+              </div>
+
+              {/* Bottom Content */}
+              <div className="absolute bottom-0 left-0 right-0 z-20 p-5">
+                <motion.div
+                  key={`${reel.id}-${activeIndex}`}
+                  initial={{ opacity: 0, y: 18 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35 }}
+                >
+                  <p className="mb-1 text-[10px] uppercase tracking-[2.5px] text-[#d89b1d]">
+                    Our Work
+                  </p>
+
+                  <h2 className="max-w-[260px] text-3xl font-black leading-[1.05] tracking-[-1px] text-white">
+                    {reel.label}
+                  </h2>
+
+                  <div className="mt-4 grid grid-cols-3 gap-2">
+                    {stats.map((item) => (
+                      <div
+                        key={item.label}
+                        className="rounded-2xl border border-white/10 bg-white/10 p-3 backdrop-blur-md"
+                      >
+                        <p className="text-lg font-black leading-none text-[#d89b1d]">
+                          {item.value}
+                        </p>
+                        <p className="mt-1 text-[8px] uppercase leading-3 tracking-[1px] text-white/45">
+                          {item.label}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-4 flex gap-3">
+                    <Link href="#projects" className="flex-1">
+                      <button className="w-full rounded-full bg-[#d89b1d] py-3 text-sm font-black text-black shadow-[0_0_25px_rgba(216,155,29,0.35)]">
+                        Projects
+                      </button>
+                    </Link>
+
+                    <Link href="#contact" className="flex-1">
+                      <button className="w-full rounded-full border border-white/15 bg-white/10 py-3 text-sm font-bold text-white backdrop-blur-md">
+                        Contact
+                      </button>
+                    </Link>
+                  </div>
+                </motion.div>
+              </div>
+
+              {index === 0 && (
+                <motion.div
+                  className="absolute bottom-36 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-1"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: [0, 1, 0] }}
+                  transition={{ delay: 1.2, duration: 2, repeat: 2 }}
+                >
+                  <svg width="20" height="20" fill="white" opacity="0.45" viewBox="0 0 24 24">
+                    <path d="M7.41 15.41 12 10.83l4.59 4.58L18 14l-6-6-6 6z" />
+                  </svg>
+                  <p className="text-[10px] uppercase tracking-[2px] text-white/40">
+                    Swipe up
+                  </p>
+                </motion.div>
+              )}
+
+              {loading && index === 0 && (
+                <div className="absolute inset-0 z-30 grid place-items-center bg-black/70">
+                  <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#d89b1d] border-t-transparent" />
+                </div>
+              )}
+            </motion.div>
+          </section>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function Hero() {
   return (
     <>
-      {/* ══ MOBILE ONLY: Dynamic Reel Feed ══ */}
-      <section className="block lg:hidden w-full h-screen overflow-hidden">
+      {/* MOBILE ONLY */}
+      <section className="block lg:hidden h-[100svh] w-full overflow-hidden">
         <MobileReelFeed />
       </section>
 
-      {/* ══ DESKTOP / TABLET: Original layout — 100% unchanged ══ */}
+      {/* DESKTOP / TABLET UNCHANGED */}
       <section className="hidden lg:block relative min-h-screen overflow-hidden bg-[#0b0b0b] text-white">
         <Image
           src="/img.png"

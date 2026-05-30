@@ -10,8 +10,8 @@ export default function Home() {
     <main className="bg-black text-white overflow-hidden">
       <Navbar />
       <Hero />
-      <Services />
       <Projects />
+      <Services />
       <Contact />
       <Footer />
     </main>
