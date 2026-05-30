@@ -60,6 +60,23 @@ function MobileReelFeed() {
   const [loading, setLoading] = useState(true);
 
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const touchStartY = useRef(0);
+  const isShifting = useRef(false);
+
+  const goToProjects = () => {
+    if (isShifting.current) return;
+    isShifting.current = true;
+
+    document.getElementById("projects")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+
+    setTimeout(() => {
+      isShifting.current = false;
+    }, 900);
+  };
 
   useEffect(() => {
     const q = query(collection(db, "reels"), orderBy("order", "asc"));
@@ -117,9 +134,29 @@ function MobileReelFeed() {
     return () => observers.forEach((observer) => observer.disconnect());
   }, [videos]);
 
+  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    const lastReel = activeIndex === videos.length - 1;
+    if (lastReel && e.deltaY > 25) {
+      goToProjects();
+    }
+  };
+
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    const endY = e.changedTouches[0].clientY;
+    const swipeUp = touchStartY.current - endY > 55;
+    const lastReel = activeIndex === videos.length - 1;
+
+    if (lastReel && swipeUp) {
+      goToProjects();
+    }
+  };
+
   return (
     <div className="relative h-[100svh] w-full overflow-hidden bg-[#050505] text-white">
-      {/* Fixed Top Brand */}
       <div className="fixed top-0 left-0 right-0 z-50 px-4 pt-[env(safe-area-inset-top)]">
         <div className="mx-auto mt-3 flex h-14 max-w-[430px] items-center justify-between rounded-full border border-white/10 bg-black/45 px-4 backdrop-blur-xl shadow-[0_10px_35px_rgba(0,0,0,0.35)]">
           <div>
@@ -147,8 +184,11 @@ function MobileReelFeed() {
         </div>
       </div>
 
-      {/* Reel Scroll */}
       <div
+        ref={scrollRef}
+        onWheel={handleWheel}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
         className="h-[100svh] w-full snap-y snap-mandatory overflow-y-scroll scroll-smooth px-3 pt-20 pb-5"
         style={{ scrollbarWidth: "none" }}
       >
@@ -191,7 +231,6 @@ function MobileReelFeed() {
 
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-black/25" />
 
-              {/* Reel Counter */}
               <div className="absolute right-3 top-1/2 z-20 flex -translate-y-1/2 flex-col gap-1.5">
                 {videos.map((_, dotIndex) => (
                   <span
@@ -204,7 +243,6 @@ function MobileReelFeed() {
                 ))}
               </div>
 
-              {/* Bottom Content */}
               <div className="absolute bottom-0 left-0 right-0 z-20 p-5">
                 <motion.div
                   key={`${reel.id}-${activeIndex}`}
@@ -236,19 +274,48 @@ function MobileReelFeed() {
                     ))}
                   </div>
 
-                  <div className="mt-4 flex gap-3">
-                    <Link href="#projects" className="flex-1">
-                      <button className="w-full rounded-full bg-[#d89b1d] py-3 text-sm font-black text-black shadow-[0_0_25px_rgba(216,155,29,0.35)]">
+                  <div className="mt-4 grid grid-cols-3 gap-2 rounded-[26px] border border-white/10 bg-black/35 p-2 backdrop-blur-xl shadow-[0_15px_35px_rgba(0,0,0,0.35)]">
+                    <Link href="#projects">
+                      <motion.button
+                        whileTap={{ scale: 0.92 }}
+                        whileHover={{ scale: 1.03 }}
+                        className="w-full rounded-full bg-[#d89b1d] py-3 text-[12px] font-black text-black shadow-[0_0_25px_rgba(216,155,29,0.35)]"
+                      >
                         Projects
-                      </button>
+                      </motion.button>
                     </Link>
 
-                    <Link href="#contact" className="flex-1">
-                      <button className="w-full rounded-full border border-white/15 bg-white/10 py-3 text-sm font-bold text-white backdrop-blur-md">
+                    <Link href="#services">
+                      <motion.button
+                        whileTap={{ scale: 0.92 }}
+                        whileHover={{ scale: 1.03 }}
+                        className="w-full rounded-full border border-white/15 bg-white/10 py-3 text-[12px] font-bold text-white backdrop-blur-md"
+                      >
+                        Services
+                      </motion.button>
+                    </Link>
+
+                    <Link href="#contact">
+                      <motion.button
+                        whileTap={{ scale: 0.92 }}
+                        whileHover={{ scale: 1.03 }}
+                        className="w-full rounded-full border border-white/15 bg-white/10 py-3 text-[12px] font-bold text-white backdrop-blur-md"
+                      >
                         Contact
-                      </button>
+                      </motion.button>
                     </Link>
                   </div>
+
+                  {index === videos.length - 1 && (
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: [0.3, 1, 0.3] }}
+                      transition={{ duration: 1.6, repeat: Infinity }}
+                      className="mt-3 text-center text-[10px] uppercase tracking-[2px] text-white/45"
+                    >
+                      Swipe up for projects
+                    </motion.p>
+                  )}
                 </motion.div>
               </div>
 
@@ -284,12 +351,10 @@ function MobileReelFeed() {
 export default function Hero() {
   return (
     <>
-      {/* MOBILE ONLY */}
       <section className="block lg:hidden h-[100svh] w-full overflow-hidden">
         <MobileReelFeed />
       </section>
 
-      {/* DESKTOP / TABLET UNCHANGED */}
       <section className="hidden lg:block relative min-h-screen overflow-hidden bg-[#0b0b0b] text-white">
         <Image
           src="/img.png"
