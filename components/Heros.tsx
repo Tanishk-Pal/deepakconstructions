@@ -68,10 +68,14 @@ function MobileReelFeed() {
     if (isShifting.current) return;
     isShifting.current = true;
 
-    document.getElementById("projects")?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
+    const projectsSection = document.querySelector("#projects");
+
+    if (projectsSection) {
+      projectsSection.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
 
     setTimeout(() => {
       isShifting.current = false;
@@ -236,8 +240,8 @@ function MobileReelFeed() {
                   <span
                     key={dotIndex}
                     className={`rounded-full transition-all duration-300 ${dotIndex === index
-                        ? "h-6 w-1 bg-[#d89b1d]"
-                        : "h-2 w-1 bg-white/30"
+                      ? "h-6 w-1 bg-[#d89b1d]"
+                      : "h-2 w-1 bg-white/30"
                       }`}
                   />
                 ))}
