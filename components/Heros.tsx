@@ -4,22 +4,51 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { db } from "@/lib/firebase";
-import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import MagneticButton from "@/components/animations/MagneticButton";
 
 interface ReelVideo {
   id: string;
   src: string;
   label: string;
+  description: string;
   order?: number;
 }
 
+const COMPANY_PHONE = "+91 6260879372"; // replace with real number
+
 const FALLBACK_VIDEOS: ReelVideo[] = [
-  { id: "f1", src: "/Excavation-vid.mp4", label: "Excavation Work", order: 1 },
-  { id: "f2", src: "/Excavation.mp4", label: "Site Excavation", order: 2 },
-  { id: "f3", src: "/pipeline-video.mp4", label: "Pipeline Installation", order: 3 },
-  { id: "f4", src: "/civil-work.mp4", label: "Civil Construction", order: 4 },
+  {
+    id: "f1",
+    src: "/Excavation-vid.mp4",
+    label: "Excavation Work",
+    description:
+      "Precision excavation for pipeline trenches, foundations and site preparation using skilled operators and reliable machines.",
+    order: 1,
+  },
+  {
+    id: "f2",
+    src: "/Excavation.mp4",
+    label: "Site Excavation",
+    description:
+      "Safe ground cutting, soil removal and land leveling for construction, pipeline and infrastructure projects.",
+    order: 2,
+  },
+  {
+    id: "f3",
+    src: "/pipeline-video.mp4",
+    label: "Pipeline Installation",
+    description:
+      "Underground and industrial pipeline work with proper alignment, durable joining and professional execution.",
+    order: 3,
+  },
+  {
+    id: "f4",
+    src: "/civil-work.mp4",
+    label: "Civil Construction",
+    description:
+      "Strong civil construction work including foundations, concrete work, structural support and finishing.",
+    order: 4,
+  },
 ];
 
 const stats = [
@@ -54,54 +83,29 @@ function AnimatedCompanyName() {
 }
 
 function MobileReelFeed() {
-  const [videos, setVideos] = useState<ReelVideo[]>(FALLBACK_VIDEOS);
+  const [videos] = useState<ReelVideo[]>(FALLBACK_VIDEOS);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [muted, setMuted] = useState(true);
-  const [loading, setLoading] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
-  const scrollRef = useRef<HTMLDivElement | null>(null);
   const touchStartY = useRef(0);
   const isShifting = useRef(false);
+
+  const activeReel = videos[activeIndex];
 
   const goToProjects = () => {
     if (isShifting.current) return;
     isShifting.current = true;
 
-    const projectsSection = document.querySelector("#projects");
-
-    if (projectsSection) {
-      projectsSection.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
+    document.querySelector("#projects")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
 
     setTimeout(() => {
       isShifting.current = false;
     }, 900);
   };
-
-  useEffect(() => {
-    const q = query(collection(db, "reels"), orderBy("order", "asc"));
-
-    const unsub = onSnapshot(
-      q,
-      (snap) => {
-        if (!snap.empty) {
-          const fetched: ReelVideo[] = snap.docs.map((doc) => ({
-            id: doc.id,
-            ...(doc.data() as Omit<ReelVideo, "id">),
-          }));
-          setVideos(fetched);
-        }
-        setLoading(false);
-      },
-      () => setLoading(false)
-    );
-
-    return () => unsub();
-  }, []);
 
   useEffect(() => {
     videoRefs.current.forEach((video, index) => {
@@ -139,8 +143,7 @@ function MobileReelFeed() {
   }, [videos]);
 
   const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-    const lastReel = activeIndex === videos.length - 1;
-    if (lastReel && e.deltaY > 25) {
+    if (activeIndex === videos.length - 1 && e.deltaY > 25) {
       goToProjects();
     }
   };
@@ -152,48 +155,78 @@ function MobileReelFeed() {
   const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
     const endY = e.changedTouches[0].clientY;
     const swipeUp = touchStartY.current - endY > 55;
-    const lastReel = activeIndex === videos.length - 1;
 
-    if (lastReel && swipeUp) {
+    if (activeIndex === videos.length - 1 && swipeUp) {
       goToProjects();
     }
   };
 
   return (
     <div className="relative h-[100svh] w-full overflow-hidden bg-[#050505] text-white">
-      <div className="fixed top-0 left-0 right-0 z-50 px-4 pt-[env(safe-area-inset-top)]">
-        <div className="mx-auto mt-3 flex h-14 max-w-[430px] items-center justify-between rounded-full border border-white/10 bg-black/45 px-4 backdrop-blur-xl shadow-[0_10px_35px_rgba(0,0,0,0.35)]">
-          <div>
+      {/* TOP BAR */}
+      <div className="fixed top-0 left-0 right-0 z-50 px-3 pt-[env(safe-area-inset-top)]">
+        <div className="relative mx-auto mt-3 flex h-[58px] max-w-[430px] items-center justify-between rounded-full border border-white/10 bg-black/55 pl-4 pr-2 backdrop-blur-xl shadow-[0_10px_35px_rgba(0,0,0,0.35)]">
+          <div className="min-w-0 flex-1">
             <AnimatedCompanyName />
-            <p className="mt-[-2px] text-[9px] uppercase tracking-[2px] text-white/45">
+            <p className="mt-[-2px] truncate text-[9px] uppercase tracking-[2px] text-white/45">
               Infrastructure • Pipeline • Civil Work
             </p>
           </div>
 
-          <button
-            onClick={() => setMuted((value) => !value)}
-            className="grid h-9 w-9 place-items-center rounded-full border border-white/10 bg-white/10"
-            aria-label={muted ? "Unmute video" : "Mute video"}
-          >
-            {muted ? (
-              <svg width="17" height="17" fill="white" viewBox="0 0 24 24">
-                <path d="M4.27 3 3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06A8.99 8.99 0 0 0 17.73 19L19 20.27 20.27 19 5.27 3H4.27zM12 4 9.91 6.09 12 8.18V4z" />
+          <div className="ml-2 flex shrink-0 items-center gap-2">
+            <a
+              href={`tel:${COMPANY_PHONE}`}
+              className="flex h-10 items-center justify-center rounded-full bg-green-500 px-5 text-[12px] font-black leading-none text-black shadow-[0_0_24px_rgba(34,197,94,0.5)]"
+            >
+              Call Now
+            </a>
+
+            <button
+              onClick={() => setMenuOpen((value) => !value)}
+              className="grid h-10 w-10 place-items-center rounded-full border border-white/10 bg-white/10 shadow-inner"
+              aria-label="Open menu"
+            >
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
+                <path
+                  d="M5 7h14M5 12h14M5 17h14"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
               </svg>
-            ) : (
-              <svg width="17" height="17" fill="white" viewBox="0 0 24 24">
-                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
-              </svg>
-            )}
-          </button>
+            </button>
+          </div>
+
+          {menuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -8, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              className="absolute right-2 top-16 w-44 overflow-hidden rounded-2xl border border-white/10 bg-black/90 p-2 backdrop-blur-xl shadow-[0_18px_45px_rgba(0,0,0,0.45)]"
+            >
+              <Link
+                href="/admin"
+                className="block rounded-xl px-4 py-3 text-sm font-bold text-white hover:bg-white/10"
+              >
+                Admin Panel
+              </Link>
+
+              <a
+                href={`tel:${COMPANY_PHONE}`}
+                className="block rounded-xl bg-green-500 px-4 py-3 text-sm font-black text-black"
+              >
+                Call Now
+              </a>
+            </motion.div>
+          )}
         </div>
       </div>
 
+      {/* REEL AREA */}
       <div
-        ref={scrollRef}
         onWheel={handleWheel}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        className="h-[100svh] w-full snap-y snap-mandatory overflow-y-scroll scroll-smooth px-3 pt-20 pb-5"
+        className="h-[100svh] w-full snap-y snap-mandatory overflow-y-scroll scroll-smooth px-3 pt-[82px]"
         style={{ scrollbarWidth: "none" }}
       >
         <style>{`
@@ -205,8 +238,9 @@ function MobileReelFeed() {
         {videos.map((reel, index) => (
           <section
             key={reel.id}
-            className="relative flex h-[100svh] snap-start snap-always items-center justify-center"
+            className="relative flex h-[100svh] snap-start snap-always flex-col items-center justify-start"
           >
+            {/* VIDEO CARD */}
             <motion.div
               initial={{ opacity: 0.7, scale: 0.96 }}
               animate={{
@@ -214,51 +248,48 @@ function MobileReelFeed() {
                 scale: activeIndex === index ? 1 : 0.94,
               }}
               transition={{ duration: 0.35, ease: "easeOut" }}
-              className="relative h-[76svh] w-full max-w-[430px] overflow-hidden rounded-[34px] border border-white/10 bg-[#101010] shadow-[0_28px_70px_rgba(0,0,0,0.55)]"
+              className="relative h-[68svh] w-full max-w-[430px] overflow-hidden rounded-[34px] border border-white/10 bg-[#101010] shadow-[0_28px_70px_rgba(0,0,0,0.55)]"
             >
               <video
                 ref={(el) => {
                   videoRefs.current[index] = el;
                 }}
                 src={reel.src}
-                muted={muted}
+                muted
                 loop
                 playsInline
                 preload={index === 0 ? "auto" : "metadata"}
                 className="absolute inset-0 h-full w-full object-cover"
-                onClick={(e) => {
-                  const video = e.currentTarget;
-                  if (video.paused) video.play().catch(() => { });
-                  else video.pause();
-                }}
               />
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-black/25" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/5 to-black/10" />
 
               <div className="absolute right-3 top-1/2 z-20 flex -translate-y-1/2 flex-col gap-1.5">
                 {videos.map((_, dotIndex) => (
                   <span
                     key={dotIndex}
                     className={`rounded-full transition-all duration-300 ${dotIndex === index
-                      ? "h-6 w-1 bg-[#d89b1d]"
-                      : "h-2 w-1 bg-white/30"
+                        ? "h-6 w-1 bg-[#d89b1d]"
+                        : "h-2 w-1 bg-white/30"
                       }`}
                   />
                 ))}
               </div>
 
+              {/* LOWER CONTENT INSIDE VIDEO */}
               <div className="absolute bottom-0 left-0 right-0 z-20 p-5">
                 <motion.div
                   key={`${reel.id}-${activeIndex}`}
                   initial={{ opacity: 0, y: 18 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.35 }}
+                  className="translate-y-3"
                 >
                   <p className="mb-1 text-[10px] uppercase tracking-[2.5px] text-[#d89b1d]">
                     Our Work
                   </p>
 
-                  <h2 className="max-w-[260px] text-3xl font-black leading-[1.05] tracking-[-1px] text-white">
+                  <h2 className="max-w-[260px] text-[29px] font-black leading-[1.02] tracking-[-1px] text-white">
                     {reel.label}
                   </h2>
 
@@ -282,8 +313,7 @@ function MobileReelFeed() {
                     <Link href="#projects">
                       <motion.button
                         whileTap={{ scale: 0.92 }}
-                        whileHover={{ scale: 1.03 }}
-                        className="w-full rounded-full bg-[#d89b1d] py-3 text-[12px] font-black text-black shadow-[0_0_25px_rgba(216,155,29,0.35)]"
+                        className="w-full rounded-full bg-[#d89b1d] py-3 text-[12px] font-black text-black"
                       >
                         Projects
                       </motion.button>
@@ -292,8 +322,7 @@ function MobileReelFeed() {
                     <Link href="#services">
                       <motion.button
                         whileTap={{ scale: 0.92 }}
-                        whileHover={{ scale: 1.03 }}
-                        className="w-full rounded-full border border-white/15 bg-white/10 py-3 text-[12px] font-bold text-white backdrop-blur-md"
+                        className="w-full rounded-full border border-white/15 bg-white/10 py-3 text-[12px] font-bold text-white"
                       >
                         Services
                       </motion.button>
@@ -302,48 +331,40 @@ function MobileReelFeed() {
                     <Link href="#contact">
                       <motion.button
                         whileTap={{ scale: 0.92 }}
-                        whileHover={{ scale: 1.03 }}
-                        className="w-full rounded-full border border-white/15 bg-white/10 py-3 text-[12px] font-bold text-white backdrop-blur-md"
+                        className="w-full rounded-full border border-white/15 bg-white/10 py-3 text-[12px] font-bold text-white"
                       >
                         Contact
                       </motion.button>
                     </Link>
                   </div>
-
-                  {index === videos.length - 1 && (
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: [0.3, 1, 0.3] }}
-                      transition={{ duration: 1.6, repeat: Infinity }}
-                      className="mt-3 text-center text-[10px] uppercase tracking-[2px] text-white/45"
-                    >
-                      Swipe up for projects
-                    </motion.p>
-                  )}
                 </motion.div>
               </div>
+            </motion.div>
 
-              {index === 0 && (
-                <motion.div
-                  className="absolute bottom-36 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-1"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: [0, 1, 0] }}
-                  transition={{ delay: 1.2, duration: 2, repeat: 2 }}
+            {/* BLACK BOTTOM CONTENT AREA */}
+            <motion.div
+              key={`bottom-${activeReel.id}`}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35 }}
+              className="w-full max-w-[430px] px-5 pt-5"
+            >
+              <p className="text-[10px] uppercase tracking-[2.5px] text-[#d89b1d]">
+                Project Detail
+              </p>
+
+              <p className="mt-1 text-[13px] leading-5 text-white/65">
+                {activeReel.description}
+              </p>
+
+              <a href={`tel:${COMPANY_PHONE}`}>
+                <motion.button
+                  whileTap={{ scale: 0.96 }}
+                  className="mt-3 w-full rounded-full bg-green-500 py-3 text-sm font-black text-black shadow-[0_0_30px_rgba(34,197,94,0.45)]"
                 >
-                  <svg width="20" height="20" fill="white" opacity="0.45" viewBox="0 0 24 24">
-                    <path d="M7.41 15.41 12 10.83l4.59 4.58L18 14l-6-6-6 6z" />
-                  </svg>
-                  <p className="text-[10px] uppercase tracking-[2px] text-white/40">
-                    Swipe up
-                  </p>
-                </motion.div>
-              )}
-
-              {loading && index === 0 && (
-                <div className="absolute inset-0 z-30 grid place-items-center bg-black/70">
-                  <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#d89b1d] border-t-transparent" />
-                </div>
-              )}
+                  Call Now for Project Discussion
+                </motion.button>
+              </a>
             </motion.div>
           </section>
         ))}
@@ -359,6 +380,7 @@ export default function Hero() {
         <MobileReelFeed />
       </section>
 
+      {/* PC / TABLET UNCHANGED */}
       <section className="hidden lg:block relative min-h-screen overflow-hidden bg-[#0b0b0b] text-white">
         <Image
           src="/img.png"
@@ -408,6 +430,7 @@ export default function Hero() {
                     View Projects
                   </MagneticButton>
                 </Link>
+
                 <Link href="#contact" className="w-full sm:w-auto">
                   <MagneticButton className="w-full sm:w-auto border border-white/10 bg-white/[0.05] backdrop-blur-md text-white px-8 sm:px-9 py-4 rounded-full font-semibold hover:border-[#d89b1d] hover:text-[#d89b1d] transition-all duration-300">
                     Contact Us
