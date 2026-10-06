@@ -11,32 +11,24 @@ export default function LoaderProvider({
 }) {
   const pathname = usePathname();
   const firstLoad = useRef(true);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setLoading(true);
-
-    let timer: NodeJS.Timeout;
-
-    const hideLoader = () => {
-      timer = setTimeout(
-        () => setLoading(false),
-        firstLoad.current ? 2600 : 1800
-      );
-
-      firstLoad.current = false;
-    };
-
-    if (document.readyState === "complete") {
-      hideLoader();
-    } else {
-      window.addEventListener("load", hideLoader);
+    // Only show quick loader on first session load
+    if (typeof window !== "undefined") {
+      const hasLoaded = sessionStorage.getItem("dc_loaded");
+      if (!hasLoaded && firstLoad.current) {
+        setLoading(true);
+        sessionStorage.setItem("dc_loaded", "true");
+        const timer = setTimeout(() => {
+          setLoading(false);
+        }, 650);
+        firstLoad.current = false;
+        return () => clearTimeout(timer);
+      }
     }
-
-    return () => {
-      window.removeEventListener("load", hideLoader);
-      clearTimeout(timer);
-    };
+    setLoading(false);
+    firstLoad.current = false;
   }, [pathname]);
 
   return (
@@ -44,10 +36,8 @@ export default function LoaderProvider({
       {loading && <ConstructionLoader />}
 
       <div
-        className={`transition-all duration-700 ease-out ${
-          loading
-            ? "opacity-0 translate-y-5 scale-[0.99]"
-            : "opacity-100 translate-y-0 scale-100"
+        className={`transition-opacity duration-300 ${
+          loading ? "opacity-0" : "opacity-100"
         }`}
       >
         {children}

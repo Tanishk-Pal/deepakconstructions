@@ -3,49 +3,46 @@
 import { useRef } from "react";
 
 export default function MagneticButton({
-    children,
-    className = "",
+  children,
+  className = "",
+  as: Component = "span",
+  onClick,
 }: {
-    children: React.ReactNode;
-    className?: string;
+  children: React.ReactNode;
+  className?: string;
+  as?: React.ElementType;
+  onClick?: () => void;
 }) {
+  const ref = useRef<HTMLElement>(null);
 
-    const ref = useRef<HTMLButtonElement>(null);
+  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    const rect = ref.current?.getBoundingClientRect();
+    if (!rect || !ref.current) return;
 
-    const handleMouseMove = (
-        e: React.MouseEvent<HTMLButtonElement>
-    ) => {
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
 
-        const rect = ref.current?.getBoundingClientRect();
+    const moveX = (x - rect.width / 2) / 8;
+    const moveY = (y - rect.height / 2) / 8;
 
-        if (!rect || !ref.current) return;
+    ref.current.style.transform = `translate(${moveX}px, ${moveY}px)`;
+  };
 
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+  const reset = () => {
+    if (!ref.current) return;
+    ref.current.style.transform = "translate(0px, 0px)";
+  };
 
-        const moveX = (x - rect.width / 2) / 8;
-        const moveY = (y - rect.height / 2) / 8;
-
-        ref.current.style.transform =
-            `translate(${moveX}px, ${moveY}px)`;
-    };
-
-    const reset = () => {
-        if (!ref.current) return;
-
-        ref.current.style.transform =
-            "translate(0px,0px)";
-    };
-
-    return (
-
-        <button
-            ref={ref}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={reset}
-            className={`transition-transform duration-200 ${className}`}
-        >
-            {children}
-        </button>
-    );
+  return (
+    <Component
+      ref={ref as any}
+      onClick={onClick}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={reset}
+      suppressHydrationWarning
+      className={`inline-flex items-center justify-center transition-transform duration-200 cursor-pointer ${className}`}
+    >
+      {children}
+    </Component>
+  );
 }

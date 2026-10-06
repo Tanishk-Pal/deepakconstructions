@@ -4,53 +4,85 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import FadeUp from "@/components/animations/FadeUp";
 import MagneticButton from "@/components/animations/MagneticButton";
+import { CheckCircle2, PhoneCall } from "lucide-react";
 
 const services = [
   {
     title: "Water Pipeline Installation",
+    hindiTitle: "वाटर पाइपलाइन इंस्टॉलेशन",
     slug: "water-pipeline-installation",
     description:
-      "We provide underground and industrial water pipeline installation services using modern machinery, precision engineering and experienced manpower.",
+      "अंडरग्राउंड व इंडस्ट्रियल पेयजल पाइपलाइन इंस्टॉलेशन। आधुनिक ट्रेंचिंग, हाई-प्रेशर जॉइंटिंग, वॉल्व फिटिंग और प्रेशर टेस्टिंग कार्य अनुभवी टीम द्वारा।",
+    points: [
+      "MS, DI व HDPE पाइपलाइन फिटिंग",
+      "अंडरग्राउंड व इंडस्ट्रियल वाटर नेटवर्क",
+      "हाइड्रोलिक लीकेज व प्रेशर टेस्टिंग",
+    ],
     image: "/pipeline.png",
   },
-
   {
     title: "Civil Construction",
+    hindiTitle: "सिविल व आरसीसी निर्माण",
     slug: "civil-construction",
     description:
-      "Complete civil infrastructure development including reinforced structures, industrial foundations and commercial construction.",
+      "मजबूत कंक्रीट स्ट्रक्चर, इंडस्ट्रियल शेड, बाउंड्री वॉल, रिटेनिंग वॉल और कमर्शियल बिल्डिंग का फाउंडेशन से लेकर सुपरस्ट्रक्चर तक निर्माण।",
+    points: [
+      "मजबूत RCC फाउंडेशन व पिलर वर्क",
+      "इंडस्ट्रियल वेयरहाउस व प्लांट शेड",
+      "A-Grade सीमेंट व स्टील मटीरियल",
+    ],
     image: "/civil.png",
   },
-
   {
     title: "Excavation Work",
+    hindiTitle: "हैवी एक्सकेवेशन व मिट्टी कटाई",
     slug: "excavation-work",
     description:
-      "Safe and large-scale excavation solutions executed with advanced equipment and technical expertise.",
+      "आधुनिक भारी JCB व पोकलेन मशीनों द्वारा गहरी नींव, ट्रेंच, बेसमेंट, तालाब व नहर की सटीक और तीव्र खुदाई व साइट समतलीकरण कार्य।",
+    points: [
+      "JCB, पोकलेन व डंपर फ्लीट",
+      "पाइपलाइन ट्रेंच व बेसमेंट खुदाई",
+      "रॉक ब्रेकिंग व ग्राउंड लेवलिंग",
+    ],
     image: "/excavation.png",
   },
-
   {
     title: "Industrial Pipeline Systems",
+    hindiTitle: "इंडस्ट्रियल पाइपलाइन सिस्टम",
     slug: "industrial-pipeline-systems",
     description:
-      "Industrial-grade pipeline systems designed for durability, safety and long-term operational performance.",
+      "फैक्ट्री व औद्योगिक संयंत्रों के लिए हेवी-ड्यूटी हाई प्रेशर पाइपलाइन नेटवर्क। उच्च सुरक्षा मानकों व लॉन्ग-टर्म ड्यूरेबिलिटी के साथ।",
+    points: [
+      "हाई-प्रेशर इंडस्ट्रियल पाइपिंग",
+      "सुरक्षा मानकों व ISI गाइडलाइंस",
+      "एक्सपीरियंसड वेल्डर व फिटर टीम",
+    ],
     image: "/industrial.png",
   },
-
   {
     title: "Building Construction",
+    hindiTitle: "बिल्डिंग व कमर्शियल स्ट्रक्चर",
     slug: "building-construction",
     description:
-      "Professional building construction services with modern engineering and quality execution standards.",
+      "क्वालिटी मटीरियल और अनुभवी इंजीनियरों के सुपरविज़न में आवासीय, कमर्शियल व वेयरहाउस प्रोजेक्ट्स का पक्का और समयबद्ध निर्माण।",
+    points: [
+      "इंजीनियरिंग सुपरविज़न व डिजाइन",
+      "समयबद्ध प्रोजेक्ट डिलीवरी की गारंटी",
+      "मजबूत और टिकाऊ आर्किटेक्चर",
+    ],
     image: "/building.png",
   },
-
   {
     title: "Drainage Infrastructure",
+    hindiTitle: "ड्रेनेज व सीवरेज इंफ्रास्ट्रक्चर",
     slug: "drainage-infrastructure",
     description:
-      "Drainage and wastewater infrastructure systems for residential, industrial and urban development projects.",
+      "पक्का कंक्रीट नाला निर्माण, स्टॉर्म वॉटर ड्रेनेज व सीवर पाइपलाइन नेटवर्क। जलभराव की समस्या का स्थायी व मजबूत कंक्रीट समाधान।",
+    points: [
+      "RCC कंक्रीट नाला व बॉक्स कल्वर्ट",
+      "सीवेज व वेस्टवाटर पाइपलाइन",
+      "लॉन्ग-टर्म वाटरफ्लो सेफ्टी",
+    ],
     image: "/drainage.png",
   },
 ];
@@ -59,280 +91,145 @@ export default function Services() {
   return (
     <section
       id="services"
-      className="relative overflow-hidden bg-[#f5f3ee] text-black py-20 md:py-32 px-4 sm:px-6"    >
-
+      className="relative overflow-hidden bg-[#f7f6f2] text-slate-900 py-20 md:py-32 px-4 sm:px-6"
+    >
       {/* BACKGROUND GLOW */}
-      <div className="absolute top-[-10%] right-[-10%] w-[700px] h-[700px] bg-[#d89b1d]/10 blur-[140px] rounded-full" />
+      <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-amber-500/10 blur-[140px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-amber-500/5 blur-[120px] rounded-full pointer-events-none" />
 
       <div className="max-w-7xl mx-auto relative z-10">
-
         <FadeUp>
-
           {/* HEADER */}
-
-
-          <div className="mb-28 max-w-5xl">
-
-            <div className="flex items-center gap-4 mb-8">
-
-              <div className="w-16 h-[2px] bg-[#d89b1d]" />
-
-              <p className="uppercase tracking-[5px] text-[#d89b1d] text-sm font-semibold">
-                Our Services
+          <div className="mb-20 max-w-5xl">
+            <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 mb-6">
+              <span className="w-2 h-2 rounded-full bg-[#f59e0b]" />
+              <p className="uppercase tracking-[4px] text-[#d97706] text-xs font-bold">
+                हमारी मुख्य सेवाएं • Our Specialized Services
               </p>
-
             </div>
 
-            <h2 className="text-4xl sm:text-5xl md:text-7xl font-black leading-[1.05] tracking-[-2px] md:tracking-[-3px]">
-              Premium Infrastructure
-              <span className="text-[#d89b1d]"> Solutions</span>
-
+            <h2 className="text-3xl sm:text-5xl md:text-6xl font-black leading-[1.08] tracking-[-1.5px] text-[#0f172a]">
+              विश्वसनीय इंफ्रास्ट्रक्चर
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#f59e0b] to-[#d97706]"> सॉल्यूशंस</span>
             </h2>
 
-
-            <p className="text-gray-600 text-base sm:text-lg leading-8 sm:leading-10 mt-8 max-w-4xl">
-
-              Deepak Construction भरोसेमंद Infrastructure, Pipeline,
-              Excavation aur Civil Construction services provide karta hai.
-              Hum modern machine, experienced staff aur strong execution ke saath
-              high-quality kaam time par complete karte hain — चाहे industrial
-              pipeline ho, road work ho ya large construction project.
-
+            <p className="text-slate-600 text-base sm:text-lg leading-8 mt-6 max-w-4xl">
+              <strong className="text-slate-900 font-bold">Deepak Construction</strong> भरोसेमंद Infrastructure, Pipeline,
+              Excavation और Civil Construction सेवाएं प्रदान करता है। हम आधुनिक JCB व पोकलेन मशीनरी,
+              कुशल मैनपॉवर और A-Grade मटीरियल के साथ हर काम समय पर पूरा करते हैं —
+              चाहे सरकारी टेंडर हो, इंडस्ट्रियल प्लांट हो या प्राइवेट निर्माण कार्य।
             </p>
-
           </div>
         </FadeUp>
 
-
-        {/* SERVICES */}
-        <div className="space-y-20">
-
+        {/* SERVICES CARDS */}
+        <div className="space-y-16">
           {services.map((service, index) => (
-
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 80 }}
+              initial={{ opacity: 0, y: 60 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{
-                duration: 1,
+                duration: 0.8,
                 ease: [0.16, 1, 0.3, 1],
               }}
             >
-
-
-
-
-              <div className="
-                    grid lg:grid-cols-2 items-center
-                    overflow-hidden
-                    rounded-[42px]
-                    bg-white
-                    border border-black/5
-                    shadow-[0_20px_80px_rgba(0,0,0,0.06)]
-                    hover:shadow-[0_30px_120px_rgba(0,0,0,0.12)]
-                    transition-all
-                    duration-700
-                  ">
-
+              <div className="grid lg:grid-cols-2 items-center overflow-hidden rounded-[36px] bg-white border border-slate-200/80 shadow-[0_20px_70px_rgba(15,23,42,0.06)] hover:shadow-[0_30px_100px_rgba(245,158,11,0.12)] transition-all duration-500">
                 {/* IMAGE */}
-                <div className="relative overflow-hidden h-[260px] sm:h-[340px] md:h-[420px] lg:h-[520px]">
-
-
+                <div className="relative overflow-hidden h-[260px] sm:h-[340px] md:h-[420px] lg:h-[480px]">
                   <motion.img
-                    whileHover={{ scale: 1.08 }}
-                    transition={{ duration: 2 }}
+                    whileHover={{ scale: 1.06 }}
+                    transition={{ duration: 1.5 }}
                     src={service.image}
                     alt={service.title}
                     className="w-full h-full object-cover"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
-
+                  {/* BADGE ON IMAGE */}
+                  <div className="absolute top-5 left-5 bg-[#0f172a]/80 backdrop-blur-md border border-white/20 text-white px-4 py-1.5 rounded-full text-xs font-bold tracking-wide">
+                    {service.hindiTitle}
+                  </div>
                 </div>
 
                 {/* CONTENT */}
-                <div className="p-6 sm:p-10 md:p-14 flex flex-col justify-center relative overflow-hidden">
-
-                  {/* GLOW */}
-                  <div className="absolute top-[-20%] right-[-10%] w-[250px] h-[250px] bg-[#d89b1d]/10 blur-[90px] rounded-full" />
-
-                  {/* LABEL */}
-                  <div className="flex items-center gap-4 mb-8 relative z-10">
-
-                    <div className="w-14 h-[2px] bg-[#d89b1d]" />
-
-                    <p className="uppercase tracking-[5px] text-[#d89b1d] text-xs font-semibold">
-                      Infrastructure Service
+                <div className="p-6 sm:p-10 md:p-12 flex flex-col justify-center relative overflow-hidden">
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="w-8 h-[3px] bg-[#f59e0b] rounded-full" />
+                    <p className="uppercase tracking-[3px] text-[#d97706] text-xs font-bold">
+                      Infrastructure Excellence
                     </p>
-
                   </div>
 
-                  {/* TITLE */}
-                  <h3 className="
-                        text-2xl
-                        sm:text-3xl
-                        md:text-5xl
-                        font-black
-                        leading-tight
-                        tracking-[-2px]
-                        mb-8
-                        relative z-10
-                      ">
+                  {/* ENGLISH TITLE */}
+                  <h3 className="text-2xl sm:text-3xl md:text-4xl font-black leading-tight tracking-tight text-slate-900 mb-2">
                     {service.title}
                   </h3>
 
+                  {/* HINDI SUB-TITLE */}
+                  <p className="text-amber-700 font-bold text-base mb-5">
+                    {service.hindiTitle}
+                  </p>
+
                   {/* DESCRIPTION */}
-                  <p className="
-                        text-gray-600
-                        text-base
-                        sm:text-lg
-                        leading-8
-                        sm:leading-10
-                        max-w-2xl
-                        relative z-10
-                      ">
+                  <p className="text-slate-600 text-sm sm:text-base leading-7 max-w-2xl mb-6">
                     {service.description}
                   </p>
 
-                  {/* STATS */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mt-10 sm:mt-12 relative z-10">
-
-                    {[
-                      {
-                        value: "100%",
-                        label: "Quality Assurance",
-                      },
-
-                      {
-                        value: "24/7",
-                        label: "Project Support",
-                      },
-
-                    ].map((item, i) => (
-
-                      <motion.div
-                        key={i}
-
-                        initial={{
-                          opacity: 0,
-                          scale: 0.8,
-                          y: 40,
-                        }}
-
-                        whileInView={{
-                          opacity: 1,
-                          scale: 1,
-                          y: 0,
-                        }}
-
-                        transition={{
-                          delay: i * 0.2,
-                          duration: 0.8,
-                        }}
-
-                        whileHover={{
-                          y: -8,
-                          scale: 1.03,
-                        }}
-
-                        className="
-                              bg-[#f8f6f1]
-                              border border-black/5
-                              rounded-[22px] sm:rounded-[28px]
-                              p-5 sm:p-7
-                              transition-all
-                              duration-500
-                              hover:shadow-[0_10px_40px_rgba(216,155,29,0.12)]
-                              hover:border-[#d89b1d]/20
-                              relative
-                              overflow-hidden
-                            "
-                      >
-
-                        {/* SHINE */}
-                        <div className="
-                              absolute inset-0
-                              opacity-0
-                              hover:opacity-100
-                              transition duration-700
-                            ">
-                          <div className="
-                                absolute inset-0
-                                bg-gradient-to-r
-                                from-transparent
-                                via-white/40
-                                to-transparent
-                                -translate-x-full
-                                hover:translate-x-full
-                                duration-[1800ms]
-                              " />
-                        </div>
-
-                        <h4 className="
-                              text-[#d89b1d]
-                              text-3xl sm:text-4xl
-                              font-black
-                              relative z-10
-                            ">
-                          {item.value}
-                        </h4>
-
-                        <p className="
-                              text-gray-600
-                              mt-3
-                              text-sm
-                              tracking-wide
-                              relative z-10
-                            ">
-                          {item.label}
-                        </p>
-
-                      </motion.div>
-
+                  {/* KEY POINTS LIST */}
+                  <div className="space-y-2.5 mb-8">
+                    {service.points.map((pt, i) => (
+                      <div key={i} className="flex items-center gap-2.5 text-sm text-slate-700 font-medium">
+                        <CheckCircle2 size={18} className="text-[#f59e0b] shrink-0" />
+                        <span>{pt}</span>
+                      </div>
                     ))}
-
                   </div>
 
-                  {/* BUTTON */}
-                  <div className="mt-14 relative z-10">
+                  {/* STATS */}
+                  <div className="grid grid-cols-2 gap-3 mb-8">
+                    <div className="bg-[#f8f7f4] border border-slate-200/60 rounded-2xl p-4">
+                      <h4 className="text-2xl font-black text-[#d97706]">
+                        100%
+                      </h4>
+                      <p className="text-slate-500 text-xs font-semibold mt-1">
+                        क्वालिटी गारंटी (Quality)
+                      </p>
+                    </div>
 
+                    <div className="bg-[#f8f7f4] border border-slate-200/60 rounded-2xl p-4">
+                      <h4 className="text-2xl font-black text-[#d97706]">
+                        24/7
+                      </h4>
+                      <p className="text-slate-500 text-xs font-semibold mt-1">
+                        साइट सपोर्ट (Support)
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* BUTTONS */}
+                  <div className="flex flex-wrap items-center gap-3">
                     <Link href={`/services/${service.slug}`}>
-
-                      <MagneticButton
-                        className="
-                        w-full sm:w-auto
-                      bg-[#d89b1d]
-                      text-black
-                        px-8 sm:px-10
-                        py-4 sm:py-5
-                        rounded-full
-                        font-black
-                        hover:scale-105
-                        transition-all
-                        duration-300
-                        shadow-[0_0_60px_rgba(216,155,29,0.35)]
-                        "
-                      >
-                        View Projects
+                      <MagneticButton className="bg-[#f59e0b] text-black px-6 sm:px-8 py-3.5 rounded-full font-black text-xs sm:text-sm hover:bg-[#d97706] hover:text-white transition-all duration-300 shadow-[0_0_30px_rgba(245,158,11,0.25)]">
+                        विस्तार से देखें (Details)
                       </MagneticButton>
-
                     </Link>
 
+                    <a
+                      href="tel:+916260879372"
+                      className="inline-flex items-center gap-2 border border-slate-300 bg-white hover:border-[#f59e0b] text-slate-800 px-5 sm:px-6 py-3.5 rounded-full font-bold text-xs sm:text-sm transition-all duration-300"
+                    >
+                      <PhoneCall size={15} className="text-[#d97706]" />
+                      <span>कोटेशन लें (Call)</span>
+                    </a>
                   </div>
-
                 </div>
-
               </div>
-
             </motion.div>
-
           ))}
-
         </div>
-
       </div>
-
     </section>
   );
 }

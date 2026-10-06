@@ -34,7 +34,10 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable}`}
       suppressHydrationWarning
     >
-      <body className="bg-[#f5f3ee] text-black overflow-x-hidden antialiased">
+      <body
+        className="bg-[#f5f3ee] text-black overflow-x-hidden antialiased"
+        suppressHydrationWarning
+      >
         <SmoothScrolls />
 
         <LoaderProvider>
